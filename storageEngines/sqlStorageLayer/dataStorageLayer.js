@@ -10,11 +10,29 @@ const {
 
 module.exports = class Datastorage {
     #storage
+    #getAllSql
+    #getOneSql
+    #insertSql
+    #updateSql
+    #removeSql
 
+    #primary_key
+    #resource
     constructor(storageFolder, storageConfigFile) {
         const storageConfig = require(path.join(storageFolder, storageConfigFile));
 
         const Database = require(path.join(__dirname, storageConfig.databaseFile));
+        this.#storage = new Database(storageConfig.options);
+
+        const sql = storageConfig.sqlStatements;
+        this.#getAllSql = sql.getAll.join(' ');
+        this.#getOneSql = sql.getOne.join(' ');
+        this.#insertSql = sql.insert.join(' ');
+        this.#updateSql = sql.update.join(' ');
+        this.#removeSql = sql.remove.join(' ');
+
+        this.#primary_key = sql.primary_key;
+        this.#resource = sql.resource;
     }
 
     //getters
