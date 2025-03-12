@@ -1,6 +1,6 @@
-drop database if exists employeedb;
-create database employeedb;
-use employeedb;
+drop database if exists serverEmployeeDB;
+create database serverEmployeeDB;
+use serverEmployeeDB;
 
 create table employee {
     id int not null primary key,
@@ -17,5 +17,5 @@ insert into employee values (4, 'Linda', 'Blurr', 'HR', 80000.00);
 
 drop user if exists 'horst'@'localhost';
 create user 'horst'@'localhost' identified by '1234';
-grant all privileges on employeedb.* to 'horst'@'localhost';
+grant all privileges on serverEmployeeDB.* to 'horst'@'localhost';
 

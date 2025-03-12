@@ -1,3 +1,5 @@
 {
-    
+    "getAll":[
+        "select id, firstname, lastname, "
+    ]
 }
