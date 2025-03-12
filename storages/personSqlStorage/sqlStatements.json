@@ -27,5 +27,7 @@
                 "from employee where department = ?"],
             "salary":["select id, firstname, lastname, department, salary",
                 "from employee where salary = ?"]
-        }
+        },
+        "primary_key":"id",
+        "resource":"employees"
 }
