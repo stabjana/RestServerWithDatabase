@@ -21,19 +21,22 @@ module.exports = class Datastorage {
     constructor(storageFolder, storageConfigFile) {
         const storageConfig = require(path.join(storageFolder, storageConfigFile));
 
+        const sqlStatementsPath = path.join(storageFolder, storageConfig.sqlStatements);
+        const sqlStatements = require(sqlStatementsPath);  // Load the SQL statements JSON
+
         const Database = require(path.join(__dirname, storageConfig.databaseFile));
         this.#storage = new Database(storageConfig.options);
 
-        const sql = storageConfig.sqlStatements;
-        this.#getAllSql = sql.getAll.join(' ');
-        this.#getOneSql = sql.getOne.join(' ');
-        this.#insertSql = sql.insert.join(' ');
-        this.#updateSql = sql.update.join(' ');
-        this.#removeSql = sql.remove.join(' ');
+        this.#getAllSql = sqlStatements.getAll.join(' ');
+        this.#getOneSql = sqlStatements.getOne.join(' ');
+        this.#insertSql = sqlStatements.insert.join(' ');
+        this.#updateSql = sqlStatements.update.join(' ');
+        this.#removeSql = sqlStatements.remove.join(' ');
 
-        this.#primary_key = sql.primary_key;
-        this.#resource = sql.resource;
+        this.#primary_key = sqlStatements.primary_key;
+        this.#resource = sqlStatements.resource;
     }
+
     // we stopped the lesson here and I did this part on my own:
     //getters
     get RESOURCE() {
