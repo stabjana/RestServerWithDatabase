@@ -11,6 +11,6 @@
     "allStoragesFolder": "storages",
     "storage":{
         "folder":"personSqlStorage",
-        "storageConfigFile":"storageConf.json"
+        "storageConfigFile":"storageConfig.json"
     }
 }
