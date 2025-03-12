@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "firstname": "Matt",
+        "lastname": "River",
+        "department": "ict",
+        "salary": 4000
+    },
+    {
+        "id": 2,
+        "firstname": "Mary",
+        "lastname": "River",
+        "department": "admin",
+        "salary": 5000
+    },
+    {
+        "id": 3,
+        "firstname": "Amanda",
+        "lastname": "Jones",
+        "department": "ict",
+        "salary": 4500
+    },
+    {
+        "id": 123,
+        "firstname": "Matt",
+        "lastname": "River",
+        "department": "ict",
+        "salary": 4000
+    },
+    {
+        "id": 234,
+        "firstname": "Mary",
+        "lastname": "Jones",
+        "department": "admin",
+        "salary": 7000
+    }
+]

@@ -1,0 +1,97 @@
+[
+    {
+        "ordernumber": 1,
+        "orderdate": "2023-08-03",
+        "customer": {
+            "firstname": "Matt",
+            "lastname": "River",
+            "address": {
+                "street": "Rantakatu 23",
+                "postcode": "01000 Helsinki",
+                "country": "Finland"
+               
+            }
+        },
+    
+        "products": [
+            {
+                "productId": 1,
+                "amount": 2
+ 
+            },
+            {
+                "productId": 12,
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "ordernumber": 2,
+        "orderdate": "2024-12-24",
+        "customer": {
+            "firstname": "Mary",
+            "lastname": "Jones",
+            "address": {
+                "street": "Riverside 23",
+                "postcode": "01000 London",
+                "country": "England"
+                
+            }
+        },
+       
+        "products": [
+            {
+                "productId": 1,
+                "amount": 2
+              
+            },
+            {
+                "productId": 12,
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "ordernumber": 3,
+        "orderdate": "2025-02-12",
+        "customer": {
+            "firstname": "Matt",
+            "lastname": "River",
+            "address": {
+                "street": "Rantakatu 24",
+                "postcode": "01000 Helsinki",
+                "country": "Finland"
+            
+            }
+        },
+       
+        "products": [
+            {
+                "productId": 15,
+                "amount": 1
+  
+            }
+        ]
+    },
+    {
+        "ordernumber": 4,
+        "orderdate": "2025-02-12",
+        "customer": {
+            "firstname": "Matt",
+            "lastname": "River",
+            "address": {
+                "street": "Rantakatu 23",
+                "postcode": "01000 Helsinki",
+                "country": "Finland"
+               
+            }
+        },
+        
+        "products": [
+            {
+                "productId": 15,
+                "amount": 1
+            }
+        ]
+    }
+]

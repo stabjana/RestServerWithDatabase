@@ -1,0 +1,6 @@
+{
+    "storageFile":"books.json",
+    "adapterFile":"bookAdapter.js",
+    "primary_key":"bookId",
+    "resource":"books"
+}

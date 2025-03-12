@@ -1,0 +1,16 @@
+{
+    "port":4002,
+    "host":"localhost",
+
+    "engineFolder":"storageEngines",
+    "storageEngine":{
+        "folder":"storageLayer",
+        "dataStorageFile":"dataStorageLayer.js"
+    },
+    
+    "allStoragesFolder": "storages",
+    "storage":{
+        "folder":"bookStorage",
+        "storageConfigFile":"bookStorageConf.json"
+    }
+}

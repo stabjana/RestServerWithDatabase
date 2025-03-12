@@ -1,0 +1,16 @@
+{
+    "port":4008,
+    "host":"localhost",
+
+    "engineFolder":"storageEngines",
+    "storageEngine":{
+        "folder":"storageLayer",
+        "dataStorageFile":"dataStorageLayer.js"
+    },
+    
+    "allStoragesFolder": "ComputersShopStorage",
+    "storage":{
+        "folder":"orderStorage",
+        "storageConfigFile":"orderStorageConfig.json"
+    }
+}

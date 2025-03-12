@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rest tester</title>
+    <style>
+        main{
+            display: grid;
+            align-items: left;
+            justify-items: left;
+            row-gap: 0.5em;
+        }
+        #urifield{
+            width: 25em;
+        }
+    </style>
+    <script src="handler.js"></script>
+</head>
+<body>
+    <main>
+        <h1>Rest tester</h1>
+        <label for="urifield">Resource URI: <input type="text" id="urifield"></label>
+        <fieldset id="methods">
+            <legend>Choose:</legend>
+            <label><input type="radio"name="method" value="GET" id="get">GET</label>
+            <label><input type="radio" name="method" value="PUT">PUT</label>
+            <label><input type="radio" name="method" value="POST">POST</label>
+            <label><input type="radio" name="method" value="DELETE">DELETE</label>
+        </fieldset>
+
+        <h2>JSON body</h2>
+        <div>
+            <textarea id="jsonarea" cols="50" rows="10"></textarea>
+        </div>
+        <button id="submit">Submit</button>
+        <h2>Result:</h2>
+        <pre id="resultarea"></pre>
+    </main>
+</body>
+</html>
