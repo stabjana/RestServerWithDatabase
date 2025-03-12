@@ -34,11 +34,12 @@ module.exports = class Datastorage {
         this.#primary_key = sql.primary_key;
         this.#resource = sql.resource;
     }
-
+    // we stopped the lesson here and I did this part on my own:
     //getters
     get RESOURCE() {
-        return this.#storage.RESOURCE;
+        return this.#resource;
     }
+
     get CODES() {
         return CODES;
     }
@@ -48,82 +49,56 @@ module.exports = class Datastorage {
     }
 
     get PRIMARY_KEY() {
-        return this.#storage.PRIMARY_KEY;
+        return this.#primary_key;
     }
 
-    get KEYS() {
+    async getKeys() {
         return this.#storage.getKeys();
     }
 
-    getAll() {
-        return this.#storage.getAllFromStorage();
+    async getAll() {
+        return this.#storage.executeQuery(this.#getAllSql);
     }
 
-    get(value, key = this.PRIMARY_KEY) { //this.PRIMARY_KEY
-        return this.#storage.getFromStorage(value, key);
+    async get(value, key = this.#primary_key) {
+        return this.#storage.executeQuery(this.#getOneSql, [value, key]);
     }
 
-    insert(item) {
-        return new Promise(async (resolve, reject) => {
-            if (item) {
-                if (!item[this.PRIMARY_KEY]) {
-                    reject(MESSAGES.NOT_INSERTED());
-                }
-                else if ((await this.#storage.getFromStorage(item[this.PRIMARY_KEY])).length > 0) {
-                    reject(MESSAGES.ALLREADY_IN_USE(item[this.PRIMARY_KEY]));
-                }
-                else if (await this.#storage.addToStorage(item)) {
-                    resolve(MESSAGES.INSERT_OK(this.PRIMARY_KEY, item[this.PRIMARY_KEY]));
-                }
-                else {
-                    reject(MESSAGES.NOT_INSERTED());
-                }
-            }
-            else {
-                reject(MESSAGES.NOT_INSERTED());
-            }
-        });
-    } // end of insert
+    async insert(item) {
+        if (!item || !item[this.#primary_key]) {
+            throw new Error(MESSAGES.NOT_INSERTED());
+        }
 
-    update(item) {
-        return new Promise(async (resolve, reject) => {
-            if (item) {
-                if (!item[this.PRIMARY_KEY]) {
-                    reject(MESSAGES.NOT_UPDATED());
-                }
-                else if ((await this.#storage.getFromStorage(item[this.PRIMARY_KEY])).length > 0) {
-                    if (await this.#storage.updateStorage(item)) {
-                        resolve(MESSAGES.UPDATE_OK(this.PRIMARY_KEY, item[this.PRIMARY_KEY]));
-                    }
-                    else {
-                        reject(MESSAGES.NOT_UPDATED());
-                    }
-                }
-                else if (await this.#storage.addToStorage(item)) {
-                    resolve(MESSAGES.INSERT_OK(this.PRIMARY_KEY, item[this.PRIMARY_KEY]))
-                }
-                else {
-                    reject(MESSAGES.NOT_INSERTED());
-                }
-            }
-            else {
-                reject(MESSAGES.NOT_UPDATED());
-            }
-        });
-    };
+        const exists = await this.get(item[this.#primary_key]);
+        if (exists.length > 0) {
+            throw new Error(MESSAGES.ALREADY_IN_USE(item[this.#primary_key]));
+        }
 
-    remove(value) {
-        return new Promise(async (resolve, reject) => {
-            if (!value) {
-                reject(MESSAGES.NOT_FOUND(this.PRIMARY_KEY, '--empty--'));
-            }
-            else if (await this.#storage.removeFromStorage(value)) {
-                resolve(MESSAGES.REMOVE_OK(this.PRIMARY_KEY, value));
-            }
-            else {
-                reject(MESSAGES.NOT_REMOVED(this.PRIMARY_KEY, value));
-            }
-        });
-    } //end of remove
+        const result = await this.#storage.executeQuery(this.#insertSql, Object.values(item));
+        return result.affectedRows ? MESSAGES.INSERT_OK(this.#primary_key, item[this.#primary_key]) : MESSAGES.NOT_INSERTED();
+    }
+
+    async update(item) {
+        if (!item || !item[this.#primary_key]) {
+            throw new Error(MESSAGES.NOT_UPDATED());
+        }
+        const exists = await this.get(item[this.#primary_key]);
+        if (exists.length === 0) {
+            throw new Error(MESSAGES.NOT_FOUND(this.#primary_key, item[this.#primary_key]));
+        }
+
+        const result = await this.#storage.executeQuery(this.#updateSql, Object.values(item));
+        return result.affectedRows ? MESSAGES.UPDATE_OK(this.#primary_key, item[this.#primary_key]) : MESSAGES.NOT_UPDATED();
+    }
+
+    async remove(value) {
+        if (!value) {
+            throw new Error(MESSAGES.NOT_FOUND(this.#primary_key, '--empty--'));
+        }
+
+        const result = await this.#storage.executeQuery(this.#removeSql, [value]);
+        return result.affectedRows ? MESSAGES.REMOVE_OK(this.#primary_key, value) : MESSAGES.NOT_REMOVED(this.#primary_key, value);
+    }
+
 
 } //end of class
