@@ -2,10 +2,10 @@
 
 const path = require('path');
 
-const express=require('express');
+const express = require('express');
 
 
-const cors=require('cors');
+const cors = require('cors');
 
 const errorMessage = `
 ########################################
@@ -29,13 +29,13 @@ else {
     }
 } //main program end
 
-function startServer(config){
+function startServer(config) {
 
     const app = express();
 
     const { port, host } = config;
-    const storageEnginePath=path.join(__dirname, config.engineFolder, config.storageEngine.folder);
-    const dataStoragePath = path.join(storageEnginePath,config.storageEngine.dataStorageFile);
+    const storageEnginePath = path.join(__dirname, config.engineFolder, config.storageEngine.folder);
+    const dataStoragePath = path.join(storageEnginePath, config.storageEngine.dataStorageFile);
 
     const storagePath = path.join(__dirname, config.allStoragesFolder, config.storage.folder);
 
@@ -62,7 +62,7 @@ function startServer(config){
     );
 
     app.get(`/api/${storage.RESOURCE}/:key/:value`, (req, res) =>
-        storage.get(req.params.value,req.params.key).then(result => res.json(result))
+        storage.get(req.params.value, req.params.key).then(result => res.json(result))
     );
 
     app.post(`/api/${storage.RESOURCE}/search`, (req, res) =>

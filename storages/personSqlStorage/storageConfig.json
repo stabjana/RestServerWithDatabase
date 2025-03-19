@@ -1,6 +1,7 @@
 {
     "databaseFile":"database.js",
     "sqlStatements":"sqlStatements.json",
+    "adapterFile":"personAdapter.js",
     "parameterFunctions":"parameterFunctions.js",
     "options":{
         "host":"localhost",

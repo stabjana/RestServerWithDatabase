@@ -8,7 +8,7 @@
         "from employee where id = ?"
     ],
     "insert":[
-        "insert into employee (firstname, lastname, department, salary)",
+        "insert into employee (id, firstname, lastname, department, salary)",
         "values (?, ?, ?, ?)"
     ],
     "update":[
