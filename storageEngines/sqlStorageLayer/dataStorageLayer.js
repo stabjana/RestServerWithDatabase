@@ -6,6 +6,8 @@ const {
     TYPES,
     MESSAGES } = require('./statuscodes');
 
+let SqlParams;
+
 //Datastorage class
 
 module.exports = class Datastorage {
@@ -20,29 +22,26 @@ module.exports = class Datastorage {
 
     #primary_key
     #resource
+
     constructor(storageFolder, storageConfigFile) {
         const storageConfig = require(path.join(storageFolder, storageConfigFile));
 
         const Database = require(path.join(__dirname, storageConfig.databaseFile));
-
-        /*   const sqlStatementsPath = path.join(storageFolder, storageConfig.sqlStatements);
-          const sqlStatements = require(sqlStatementsPath);  // Load the SQL statements JSON */
-
         this.#storage = new Database(storageConfig.options);
         this.#adapt = require(path.join(storageFolder, storageConfig.adapterFile));
+        const sql = require(path.join(storageFolder, storageConfig.sqlStatements));
+        SqlParams = require(path.join(storageFolder, storageConfig.parameterFunctions));
 
-        const sqlStatements = require(path.join(storageFolder, storageConfig.sqlStatements));
+        this.#getAllSql = sql.getAll.join(' ');
+        this.#getOneSql = sql.getOne.join(' ');
+        this.#insertSql = sql.insert.join(' ');
+        this.#updateSql = sql.update.join(' ');
+        this.#removeSql = sql.remove.join(' ');
 
-        this.#getAllSql = sqlStatements.getAll.join(' ');
-        this.#getOneSql = sqlStatements.getOne.join(' ');
-        this.#insertSql = sqlStatements.insert.join(' ');
-        this.#updateSql = sqlStatements.update.join(' ');
-        this.#removeSql = sqlStatements.remove.join(' ');
+        this.#search = sql.search;
 
-        this.#search = sqlStatements.search; // sqlStatements = i. sql
-
-        this.#primary_key = sqlStatements.primary_key;
-        this.#resource = sqlStatements.resource;
+        this.#primary_key = sql.primary_key;
+        this.#resource = sql.resource;
     }
 
     // getters
@@ -71,89 +70,104 @@ module.exports = class Datastorage {
         try {
             const result = await this.#storage.doQuery(this.#getAllSql);
             return Promise.resolve(result.queryResult.map(item => this.#adapt(item)));
-        } catch (error) {
-            console.error(error);
+        }
+        catch (err) {
+            console.log(err);
             return Promise.resolve([]); // this is how we defined it in our earlier version - it couldnt fail, gives always an array back - rest server expects that.
         }
     }
 
-    async get(value, key = this.#primary_key) { // refers to capital let from server
-        /* const keys = await this.KEYS; // same thing in 2 lines...
-        if (!keys.includes(key)) {}; */
+    async get(value, key = this.PRIMARY_KEY) {
+        // const keys = await this.KEYS;
+        // if (!keys.includes(key)) {
         if (!(await this.KEYS).includes(key)) {
             return Promise.resolve([]);
         }
         try {
             const sql = this.#search[key].join(' ');
-            const result = await this.#storage.doQuery(sql, [value]);
+            const result = await this.#storage.doQuery(sql, value);
             return Promise.resolve(result.queryResult.map(item => this.#adapt(item)));
-        } catch (error) {
-            console.error(error);
-            return Promise.resolve([]); // salary is given back as string - we need adapter
         }
-    }
-
-    /*    async get(value, key = this.#primary_key) {
-           return this.#storage.executeQuery(this.#getOneSql, [value, key]);
-       } */
-
-
-
-    async insert(item) {
-        if (!item || !item[this.#primary_key]) {
-            throw new Error(MESSAGES.NOT_INSERTED());
+        catch (err) {
+            console.log(err);
+            return Promise.resolve([]);
         }
-
-        const exists = await this.get(item[this.#primary_key]);
-        if (exists.length > 0) {
-            throw new Error(MESSAGES.ALREADY_IN_USE(item[this.#primary_key]));
-        }
-
-        const result = await this.#storage.executeQuery(this.#insertSql, Object.values(item));
-        return result.affectedRows ? MESSAGES.INSERT_OK(this.#primary_key, item[this.#primary_key]) : MESSAGES.NOT_INSERTED();
     }
 
     async insert(item) {
         if (item) {
-            if (!item[this.#primary_key]) {
+            if (!item[this.PRIMARY_KEY]) {
                 return Promise.reject(MESSAGES.NOT_INSERTED());
             }
             try {
-                const result = await this.#storage.doQuery(this.#getOneSql, item[this.#primary_key]);
+                const result =
+                    await this.#storage.doQuery(this.#getOneSql, item[this.PRIMARY_KEY]);
                 if (result.queryResult.length > 0) {
-                    return Promise.reject(MESSAGES.ALREADY_IN_USE(item[this.#primary_key]));
-                } else {
-                    //  await this.#storage.doQuery(this.#insertSql, ); // we need parameter functions as static members of class
+                    return Promise.reject(MESSAGES.ALLREADY_IN_USE(item[this.PRIMARY_KEY]));
                 }
-            } catch (error) {
+                const status = await this.#storage.doQuery(this.#insertSql, SqlParams.insert(item));
+                if (status.queryResult.rowsChanged > 0) {
+                    return Promise.resolve(MESSAGES.INSERT_OK(this.PRIMARY_KEY,
+                        item[this.PRIMARY_KEY]));
+                }
+                return Promise.reject(MESSAGES.NOT_INSERTED());
+            }
+            catch (err) {
                 return Promise.reject(MESSAGES.NOT_INSERTED());
             }
         }
         else {
             return Promise.reject(MESSAGES.NOT_INSERTED());
         }
-    }
+    } // end of insert
 
     async update(item) {
-        if (!item || !item[this.#primary_key]) {
-            throw new Error(MESSAGES.NOT_UPDATED());
+        if (item) {
+            if (!item[this.PRIMARY_KEY]) {
+                return Promise.reject(MESSAGES.NOT_UPDATED());
+            }
+            try {
+                const result =
+                    await this.#storage.doQuery(this.#getOneSql, item[this.PRIMARY_KEY]);
+                if (result.queryResult.length > 0) {
+                    const upStat =
+                        await this.#storage.doQuery(this.#updateSql, SqlParams.update(item));
+                    if (upStat.queryResult.rowsChanged > 0) {
+                        return Promise.resolve(MESSAGES.UPDATE_OK(this.PRIMARY_KEY,
+                            item[this.PRIMARY_KEY]));
+                    }
+                    return Promise.reject(MESSAGES.NOT_UPDATED());
+                }
+                const status = await this.#storage.doQuery(this.#insertSql, SqlParams.insert(item));
+                if (status.queryResult.rowsChanged > 0) {
+                    return Promise.resolve(MESSAGES.INSERT_OK(this.PRIMARY_KEY,
+                        item[this.PRIMARY_KEY]));
+                }
+                return Promise.reject(MESSAGES.NOT_INSERTED());
+            }
+            catch (err) {
+                return Promise.reject(MESSAGES.NOT_UPDATED());
+            }
         }
-        const exists = await this.get(item[this.#primary_key]);
-        if (exists.length === 0) {
-            throw new Error(MESSAGES.NOT_FOUND(this.#primary_key, item[this.#primary_key]));
+        else {
+            return Promise.reject(MESSAGES.NOT_UPDATED());
         }
-
-        const result = await this.#storage.executeQuery(this.#updateSql, Object.values(item));
-        return result.affectedRows ? MESSAGES.UPDATE_OK(this.#primary_key, item[this.#primary_key]) : MESSAGES.NOT_UPDATED();
-    }
+    };
 
     async remove(value) {
         if (!value) {
-            throw new Error(MESSAGES.NOT_FOUND(this.#primary_key, '--empty--'));
+            return Promise.reject(MESSAGES.NOT_FOUND(this.PRIMARY_KEY, '--empty--'));
         }
-
-        const result = await this.#storage.executeQuery(this.#removeSql, [value]);
-        return result.affectedRows ? MESSAGES.REMOVE_OK(this.#primary_key, value) : MESSAGES.NOT_REMOVED(this.#primary_key, value);
-    }
+        try {
+            const result = await this.#storage.doQuery(this.#removeSql, value);
+            if (result.queryResult.rowsChanged > 0) {
+                return Promise.resolve(MESSAGES.REMOVE_OK(this.PRIMARY_KEY, value));
+            }
+            return Promise.reject(MESSAGES.NOT_REMOVED(this.PRIMARY_KEY, value));
+        }
+        catch (err) {
+            return Promise.reject(MESSAGES.NOT_REMOVED(this.PRIMARY_KEY, value));
+        }
+    } //end of remove
 
 } //end of class
