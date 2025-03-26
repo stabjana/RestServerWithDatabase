@@ -1,0 +1,14 @@
+{
+    "databaseFile": "database.js",
+    "sqlStatements": "sqlStatements.json",
+    "adapterFile": "computerAdapter.js",
+    "parameterFunctions": "parameterfunctions.js",
+    "options": {
+        "host": "localhost",
+        "port": "3306",
+        "user": "nerd",
+        "password": "1234",
+        "database": "computerdb",
+        "allowPublicKeyRetrieval": true
+    }
+}

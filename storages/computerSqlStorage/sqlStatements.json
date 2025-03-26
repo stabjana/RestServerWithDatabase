@@ -1,0 +1,36 @@
+{
+    "getAll":[
+        "select id, name, type, price from computer"
+    ],
+    "getOne":[
+        "select id, name, type, price from computer where id=?"
+    ],
+    "insert":[
+        "insert into computer (id, name, type, price)",
+        "values(?,?,?,?)"
+    ],
+    "update":[
+        "update computer set name=?, type=?, price=? where id=?"
+    ],
+    "remove":["delete from computer where id=?"],
+    "search":{
+        "id":[
+            "select id, name, type, price",
+            "from computer where id=?"
+        ],
+        "name":[
+            "select id, name, type, price",
+            "from computer where name=?"
+        ],
+        "type":[
+            "select id, name, type, price",
+            "from computer where type=?"
+        ],
+        "price":[
+            "select id, name, type, price",
+            "from computer where price=?"
+        ]
+    },
+    "primary_key":"id",
+    "resource":"computers"
+}

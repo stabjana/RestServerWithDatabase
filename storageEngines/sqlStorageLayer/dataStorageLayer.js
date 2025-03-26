@@ -66,7 +66,7 @@ module.exports = class Datastorage {
         return Promise.resolve(Object.keys(this.#search));
     }
 
-    async getAll() { // ERROR! GET AN EMPTY ARRAY in route: http://localhost:4012/api/employees
+    async getAll() {
         try {
             const result = await this.#storage.doQuery(this.#getAllSql);
             return Promise.resolve(result.queryResult.map(item => this.#adapt(item)));
